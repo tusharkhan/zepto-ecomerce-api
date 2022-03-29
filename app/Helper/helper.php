@@ -5,6 +5,11 @@
  * date : 3/29/2022
  */
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 if ( ! function_exists('sendResponse') ){
     /**
      * @param $message
@@ -44,5 +49,43 @@ if ( ! function_exists('sendError') ){
         ];
 
         return response()->json($response, $code);
+    }
+}
+
+
+if ( ! function_exists('uploadImage') ){
+    function uploadImage(UploadedFile $uploadedFile, $folder = null, $disk = 'public', $filename = null) {
+
+        $name = !is_null($filename) ? $filename : Str::random(25) . '_' . time();
+
+        searchFolderOrCreate($folder, $disk);
+
+        $uploadedFile = $uploadedFile->storeAs($folder, $name . '.' . $uploadedFile->getClientOriginalExtension(), $disk);
+        return explode('/', $uploadedFile)[1];
+    }
+}
+
+
+if ( ! function_exists('searchFolderOrCreate') ){
+    function searchFolderOrCreate($path, $disk) {
+        if (!Storage::disk($disk)->exists($path)) {
+            Storage::disk($disk)->makeDirectory($path);
+            artisanCall('storage:link');
+        }
+    }
+}
+
+
+
+if ( ! function_exists('artisanCall') ){
+    function artisanCall($command) {
+        Artisan::call($command);
+    }
+}
+
+
+if ( ! function_exists('createSlug') ){
+    function createSlug($string, $separator = '-') {
+        return Str::random(4) . '-'.Str::slug($string, $separator);
     }
 }

@@ -24,8 +24,10 @@ Route::middleware('auth:api')->group(function () {
             Route::get('/', [ProductController::class, 'index']);
             Route::get('/{id}', [ProductController::class, 'show']);
             Route::post('/', [ProductController::class, 'store']);
-            Route::put('/{id}', [ProductController::class, 'update']);
+            Route::post('/{id}', [ProductController::class, 'update']);
             Route::delete('/{id}', [ProductController::class, 'destroy']);
+
+            Route::get('/search/name', [ProductController::class, 'search']);
         });
     });
 });
