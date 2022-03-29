@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Auth\Admin\AdminAuthController;
+use App\Http\Controllers\Auth\User\UserAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/admin', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:api')->group(function () {
+    Route::get('/admin', [AdminAuthController::class, 'me']);
+    Route::get('/user', [UserAuthController::class, 'me']);
 });

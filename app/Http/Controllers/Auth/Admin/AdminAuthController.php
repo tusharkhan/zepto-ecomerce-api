@@ -36,8 +36,8 @@ class AdminAuthController extends Controller
 
         return sendError(
             'Unauthorized',
+            ['error' => 'Unauthorized attempt'],
             Response::HTTP_UNAUTHORIZED,
-            ['error' => 'Unauthorized attempt']
         );
     }
 
@@ -50,8 +50,8 @@ class AdminAuthController extends Controller
     {
         return sendResponse(
             'Data retrieved successfully',
+            $this->guard()->user(),
             Response::HTTP_OK,
-            $this->guard()->user()
         );
     }
 
@@ -92,13 +92,13 @@ class AdminAuthController extends Controller
     {
         return sendResponse(
             'Successfully logged in',
-            Response::HTTP_OK,
             [
                 'access_token' => $token,
                 'token_type' => 'bearer',
                 'expires_in' => $this->guard()->factory()->getTTL() * 60 * 24 * 2,
                 'user' => $this->guard()->user()
-            ]
+            ],
+            Response::HTTP_OK,
         );
     }
 
