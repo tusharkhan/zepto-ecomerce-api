@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Auth\Admin\AdminAuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,5 +19,13 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('admin')->group(function (){
         Route::get('/', [AdminAuthController::class, 'me']);
         Route::post('/logout', [AdminAuthController::class, 'logout']);
+
+        Route::prefix('products')->group(function (){
+            Route::get('/', [ProductController::class, 'index']);
+            Route::get('/{id}', [ProductController::class, 'show']);
+            Route::post('/', [ProductController::class, 'store']);
+            Route::put('/{id}', [ProductController::class, 'update']);
+            Route::delete('/{id}', [ProductController::class, 'destroy']);
+        });
     });
 });
