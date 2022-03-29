@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Auth\Admin\AdminAuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/admin', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:api')->group(function () {
+    Route::prefix('admin')->group(function (){
+        Route::get('/', [AdminAuthController::class, 'me']);
+        Route::post('/logout', [AdminAuthController::class, 'logout']);
+    });
 });

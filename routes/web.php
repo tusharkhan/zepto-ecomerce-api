@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\Admin\AdminAuthController;
 use App\Http\Controllers\Auth\User\UserAuthController;
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpFoundation\Response;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,9 +18,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return sendError(
-        'Error',
-        404,
-        ['Unable to find the page you are looking for.']
+        'Unauthorized',
+        ['error' => 'Unauthorized attempt'],
+        Response::HTTP_UNAUTHORIZED,
     );
 })->name('unavailable');
 
@@ -32,6 +33,11 @@ Route::prefix('api')->group(function () {
 
     // Auth Routes for User
     Route::prefix('user')->group(function () {
+        Route::get('/', [UserAuthController::class, 'me'])->name('user.index');
         Route::post('login', [UserAuthController::class, 'login'])->name('user.login');
+        Route::post('logout', [UserAuthController::class, 'logout'])->name('user.logout');
+        Route::post(e('register'), [UserAuthController::class, 'register'])->name('user.register');
     });
 });
+
+
