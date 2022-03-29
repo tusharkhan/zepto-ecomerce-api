@@ -66,8 +66,8 @@ class AdminAuthController extends Controller
 
         return sendResponse(
             'Successfully logged out',
+            [],
             Response::HTTP_OK,
-            []
         );
     }
 

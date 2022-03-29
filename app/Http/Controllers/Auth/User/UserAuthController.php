@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Auth\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserLoginRequest;
+use App\Http\Requests\UserRegistrationRequest;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserAuthController extends Controller
@@ -16,7 +19,7 @@ class UserAuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:web', ['except' => ['login']]);
+        $this->middleware('auth:web', ['except' => ['login', 'register']]);
     }
 
     /**
@@ -98,6 +101,28 @@ class UserAuthController extends Controller
                 'expires_in' => $this->guard()->factory()->getTTL() * 60 * 24 * 2,
                 'user' => $this->guard()->user()
             ],
+            Response::HTTP_OK,
+        );
+    }
+
+
+    /**
+     * Register a User.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function register(UserRegistrationRequest $userRegistrationRequest) {
+
+        $user = User::create([
+            'name'              => $userRegistrationRequest->name,
+            'email'             => $userRegistrationRequest->email,
+            'password'          => Hash::make($userRegistrationRequest->password),
+            'email_verified_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        return sendResponse(
+            'User created successfully',
+            $user,
             Response::HTTP_OK,
         );
     }
