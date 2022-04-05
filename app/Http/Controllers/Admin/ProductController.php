@@ -19,7 +19,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::all();
+        $limit = request()->get('limit', 10);
+
+        $products = Product::paginate($limit);
 
         return sendResponse(
             'Products retrieved successfully',
