@@ -21,13 +21,10 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AdminAuthController::class, 'logout']);
 
         Route::prefix('products')->group(function (){
-            Route::get('/', [ProductController::class, 'index']);
             Route::get('/{id}', [ProductController::class, 'show']);
             Route::post('/', [ProductController::class, 'store']);
             Route::post('/{id}', [ProductController::class, 'update']);
             Route::delete('/{id}', [ProductController::class, 'destroy']);
-
-            Route::get('/search/name', [ProductController::class, 'search']);
         });
     });
 });
