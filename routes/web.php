@@ -42,6 +42,7 @@ Route::prefix('api')->group(function () {
 
     Route::prefix('products')->group(function () {
         Route::get('/', [ProductController::class, 'index']);
+        Route::get('/{slug}', [ProductController::class, 'productBySlug']);
         Route::get('/search/name', [ProductController::class, 'search']);
     });
 });

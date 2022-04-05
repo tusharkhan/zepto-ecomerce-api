@@ -173,4 +173,24 @@ class ProductController extends Controller
             Response::HTTP_OK
         );
     }
+
+
+    public function productBySlug($slug)
+    {
+        $product = Product::where('slug', $slug)->first();
+
+        if ( ! $product ) {
+            return sendResponse(
+                'Product not found',
+                null,
+                Response::HTTP_NOT_FOUND
+            );
+        }
+
+        return sendResponse(
+            'Product retrieved successfully',
+            $product,
+            Response::HTTP_OK
+        );
+    }
 }
