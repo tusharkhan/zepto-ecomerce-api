@@ -7,6 +7,7 @@ use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegistrationRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -113,17 +114,58 @@ class UserAuthController extends Controller
      */
     public function register(UserRegistrationRequest $userRegistrationRequest) {
 
-        $user = User::create([
-            'name'              => $userRegistrationRequest->name,
-            'email'             => $userRegistrationRequest->email,
-            'password'          => Hash::make($userRegistrationRequest->password),
-            'email_verified_at' => date('Y-m-d H:i:s'),
-        ]);
+        $checkUser = User::where('email', $userRegistrationRequest->email)->first();
 
-        return sendResponse(
-            'User created successfully',
-            $user,
-            Response::HTTP_OK,
+        if ($checkUser) {
+            return sendError(
+                'User already exists',
+                ['error' => 'User already exists'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $user = User::create([
+                'name'              => $userRegistrationRequest->name,
+                'email'             => $userRegistrationRequest->email,
+                'password'          => Hash::make($userRegistrationRequest->password),
+                'email_verified_at' => date('Y-m-d H:i:s'),
+            ]);
+
+            $login = sendError(
+                'Unauthorized',
+                ['error' => 'Unauthorized attempt'],
+                Response::HTTP_UNAUTHORIZED
+            );
+
+            if ( $user ){
+                $loginUserRequest = new UserLoginRequest();
+                $loginUserRequest->merge([
+                    'email'             => $userRegistrationRequest->email,
+                    'password'          => $userRegistrationRequest->password,
+                ]);
+
+                $login = $this->login($loginUserRequest);
+            }
+
+            DB::commit();
+
+            return $login;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return sendError(
+                'Error',
+                ['error' => $e->getMessage()],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        return sendError(
+            'Something went wrong',
+            ['error' => 'Internal Server Error'],
+            Response::HTTP_INTERNAL_SERVER_ERROR,
         );
     }
 
